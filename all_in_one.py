@@ -5,7 +5,8 @@ from collections import namedtuple
 # 4 hanh dong di chuyen: 0: Len, 1: Xuong, 2: Trai, 3: Phai
 ACTIONS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 ACTION_NAMES = ["Len", "Xuong", "Trai", "Phai"]
-state = namedtuple("State", ["row", "col", "progress", "switch_on", "skip_used"])
+State = namedtuple("State", ["row", "col", "progress", "switch_on", "skip_used"])
+state = State
 
 MAPS = {
     "level1": {
@@ -102,7 +103,7 @@ def tao_moi_truong(level_name="level1"):
     }
 
     # Tim tat ca cac trang thai ma Agent co the dat toi (Reachable States)
-    trang_thai_dau = state(start[0], start[1], 0, 0, 0)
+    trang_thai_dau = State(start[0], start[1], 0, 0, 0)
     danh_sach_states = [trang_thai_dau]
     state_to_idx = {trang_thai_dau: 0}
 
@@ -158,7 +159,7 @@ def buoc_di(env, state, action):
         # Truong hop 4.2: Nhat dung kho bau can tim o giai doan hien tai
         if moi_progress < len(env["chain"]) and item in env["chain"][moi_progress]:
             moi_progress += 1
-            trang_thai_moi = state(nr, nc, moi_progress, moi_sw, moi_k)
+            trang_thai_moi = State(nr, nc, moi_progress, moi_sw, moi_k)
             return trang_thai_moi, 10.0, False  # Thuong +10 diem vi nhat dung
 
         # Truong hop 4.3: Nhat sai kho bau (nhat vuot thu tu truoc)
@@ -173,7 +174,7 @@ def buoc_di(env, state, action):
     if (nr, nc) == env["exit"]:
         # Neu da nhat du tat ca kho bau theo yeu cau
         if moi_progress >= len(env["chain"]):
-            trang_thai_moi = state(nr, nc, moi_progress, moi_sw, moi_k)
+            trang_thai_moi = State(nr, nc, moi_progress, moi_sw, moi_k)
             return trang_thai_moi, 100.0, True  # Thang game! Thuong lon +100 diem
         else:
             # Chua nhat du ma da doi ve dich -> phat vi thoat som
@@ -522,9 +523,9 @@ def main():
 
         for ten_tt, ham_tt in danh_sach_thuat_toan:
             chinh_sach = ham_tt(env)
-            diem, so_buoc, thanh_cong, _,state_final = chay_thu_nghiem(env, chinh_sach)
+            diem, so_buoc, thanh_cong, _, state_final = chay_thu_nghiem(env, chinh_sach)
             print(f"{ten_tt:<20} | {diem:<14.1f} | {so_buoc:<8} | {str(thanh_cong):<10}")
-        printf(state_final)
+        print("Trang thai ket thuc:", state_final)
     # Minh hoa quy dao toi uu tren Level 3 (Kho)
     print("\n" + "=" * 70)
     print("MINH HOA DUONG DI TOI UU CUA LEVEL 3 (Policy Iteration)")
